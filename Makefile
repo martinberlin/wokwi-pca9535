@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MIT
 
 SOURCES = src/pca9535.chip.c 
-INCLUDES = -I include
+INCLUDES = -I . -I include
 CHIP_JSON = src/pca9535io.chip.json
 
 TARBALL  = dist/chip.tar.gz
