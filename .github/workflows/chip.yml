@@ -16,13 +16,13 @@ jobs:
         with:
           sources: "src/pca9535.chip.c"
       - name: Copy chip.json
-        run: sudo cp pca9535.chip.json dist/chip.json
+        run: sudo cp pca9535.chip.json dist
       - name: 'Upload Artifacts'
         uses: actions/upload-artifact@v4
         with:
           name: chip
           path: |
-            dist/chip.json
+            dist/pca9535.chip.json
             dist/chip.wasm
 
   # The release job only runs when you push a tag starting with "v", e.g. v1.0.0 
