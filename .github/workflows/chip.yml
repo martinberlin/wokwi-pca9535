@@ -1,4 +1,4 @@
-name: Build PCA9535 Custom Chip
+name: Build Chip
 
 on:
   push:
@@ -6,31 +6,39 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    name: Build
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v3
-    - name: Build chip
-      uses: bonnyr/wokwi-chip-clang-action@main
-    - name: 'Upload Artifacts'
-      uses: actions/upload-artifact@v3
-      with:
-        name: chip
-        path: |
-          dist/chip.json
-          dist/chip.wasm
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Build chip
+        uses: wokwi/wokwi-chip-clang-action@main
+        with:
+          sources: "src/main.c"
+      - name: Copy chip.json
+        run: sudo cp chip.json dist
+      - name: 'Upload Artifacts'
+        uses: actions/upload-artifact@v4
+        with:
+          name: chip
+          path: |
+            dist/chip.json
+            dist/chip.wasm
+
+  # The release job only runs when you push a tag starting with "v", e.g. v1.0.0 
   release:
     name: Release
     needs: build
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
-      - name: Download chip artifacts (published above)
-        uses: actions/download-artifact@v3
+      - name: Download compiled chip
+        uses: actions/download-artifact@v4
         with:
           name: chip
           path: chip
-      - name: copy release
-        run: cd chip && zip -9 ../chip.zip chip.wasm chip.json
+      - name: Create a zip archive
+        run: cd chip && zip -9 ../chip.zip chip.*
         env:
           ZIP_VERSION: ${{ github.ref_name }}
       - name: Upload release
@@ -39,3 +47,4 @@ jobs:
           artifacts: chip.zip
           token: ${{ secrets.GITHUB_TOKEN }}
           generateReleaseNotes: true
+
