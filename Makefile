@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MIT
 
 SOURCES = src/pca9535.chip.c 
-INCLUDES = -I . -I include
+INCLUDES = -I include
 CHIP_JSON = src/pca9535io.chip.json
 
 TARBALL  = dist/chip.tar.gz
@@ -25,4 +25,4 @@ dist/chip.json:
 	cp $(CHIP_JSON) dist/chip.json
 
 $(TARGET): dist $(SOURCES)
-	  clang -Werror  $(INCLUDES) -o $(TARGET) $(SOURCES)
+	clang --target=wasm32-unknown-wasi --sysroot /opt/wasi-libc -nostartfiles -Wl,--import-memory -Wl,--export-table -Wl,--no-entry -Werror  $(INCLUDES) -o $(TARGET) $(SOURCES)
